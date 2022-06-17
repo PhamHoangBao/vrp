@@ -4,6 +4,14 @@ import os
 import sys
 from sklearn.cluster import KMeans
 
+def process_violation(data, capacity, fitness, index, penalty_value = 1500,):
+    total_demand = np.sum(data[np.where(data[:, 3] == index)][:,2])
+    violation_rate = (total_demand - capacity) / capacity
+    if violation_rate < 0:
+        return 0.0, fitness
+    else:
+        return violation_rate, fitness + penalty_value * (violation_rate)
+
 """
     Inverse distance - Get an array of inverted distances
     @arg
@@ -188,7 +196,7 @@ def run_ahaco(
                     if k % 2 == 1 : ## Special ant
                         ## Calculate with equation (13)
                         next_location_prob = (pheromones[last_location, :] * (inverted_distance[last_location, :] ** 3) * (reward_punish_factor ** (Y * class_relation[last_location, :]))) * allowed_k
-                        next_location_prob = next_location_prob / np.sum(next_location_prob)
+                        next_location_prob = next_location_prob / (np.sum(next_location_prob) + 0.0000001)
                         location_prob[j] = next_location_prob
                         ## Getting nearest city index base on next_location_prob and assign it to next location
                         nearest_city = np.argmax(next_location_prob)
@@ -198,7 +206,7 @@ def run_ahaco(
                     else: ## Normal ant
                         ## Calculate with equation (2)
                         next_location_prob = (pheromones[last_location, :] ** alpha) * (inverted_distance[last_location, :] ** beta) * allowed_k 
-                        next_location_prob = next_location_prob / np.sum(next_location_prob)
+                        next_location_prob = next_location_prob / (np.sum(next_location_prob) + 0.0000001)
                         location_prob[j] = next_location_prob
                         ## Getting nearest city index base on next_location_prob and assign it to next location
                         nearest_city = np.argmax(next_location_prob)

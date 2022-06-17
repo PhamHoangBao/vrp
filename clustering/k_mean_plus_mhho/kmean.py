@@ -4,6 +4,7 @@ import math
 from matplotlib.pyplot import figure
 import matplotlib.pyplot as plt
 import random
+import time
 
 def Levy(dim):
     beta = 1.5
@@ -120,6 +121,7 @@ def run_kmean_mhho(
 
     while t < max_iter:
         print(f"Iteration {t}")
+        start_time = time.time()
         for i in range(0, SearchAgents_no):
             # Check boundaries
             X[i, :] = np.clip(X[i, :], lb, ub)
@@ -133,8 +135,9 @@ def run_kmean_mhho(
                 Rabbit_Location = X[i, :].copy() 
                 centroids = new_centroids
         E1 = 2 * (1 - (t / max_iter)) # factor to show the decreaing energy of rabbit    
-        
+        # print(f"Process A : {time.time() - start_time}")
         # Update the location of Harris' hawks 
+        start_time = time.time()
         for m in range(0, SearchAgents_no):
             E0 = 2 * random.random() - 1;  # -1<E0<1
             Escaping_Energy = E1 * (E0)  # escaping energy of rabbit Eq. (3) in the paper
@@ -208,5 +211,6 @@ def run_kmean_mhho(
         if (t % 1 == 0):
                 print(['At iteration '+ str(t)+ ' the best fitness is '+ str(Rabbit_Energy)])
         t = t + 1
+        # print(f"Process B : {time.time() - start_time}")
 
     return centroids, distance_data
